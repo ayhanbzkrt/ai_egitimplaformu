@@ -1,0 +1,739 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eğitim Platformu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background: #0073e6;
+            color: #fff;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+        header .robot-animation {
+            font-size: 3rem;
+            margin-right: 20px;
+            animation: float 2s infinite;
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        #container {
+            display: flex;
+            flex: 1;
+            margin-top: 70px; /* Adjusted for fixed header */
+        }
+        #sidebar {
+            width: 300px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            height: calc(100vh - 70px); /* Adjusted for fixed header */
+            overflow-y: auto;
+            position: fixed; /* Fixed position for sidebar */
+            top: 70px; /* Adjusted for fixed header */
+        }
+        #main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin-left: 320px; /* Adjusted for fixed sidebar width */
+        }
+        #topic-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .scenario-block {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: grab;
+        }
+        .scenario-block:hover {
+            background-color: #f0f0f0;
+        }
+        #dropzone {
+            margin-top: 20px;
+            width: 800px;
+            height: 300px;
+            border: 2px dashed #bbb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 10px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        #dropzone.dragover {
+            background-color: #e6e6e6;
+            border-color: #666;
+        }
+        #explanation, #output {
+            margin-top: 20px;
+            width: 800px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .code-block {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        .code-explanation {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .code-output {
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #extra-content {
+            width: 300px;
+            background-color: #fff;
+            border-left: 1px solid #ddd;
+            padding: 20px;
+            height: calc(100vh - 70px); /* Adjusted for fixed header */
+            overflow-y: auto;
+            position: fixed; /* Fixed position for sidebar */
+            top: 70px; /* Adjusted for fixed header */
+            right: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">AI'han</div>
+        <div class="robot-animation">🤖</div>
+    </header>
+    <div id="container">
+        <div id="sidebar">
+            <h1>Konu Listesi</h1>
+            <ul id="topic-list"></ul>
+        </div>
+        <div id="main">
+            <h1>Eğitim Platformu</h1>
+            <div id="dropzone">Konuyu buraya sürükleyin</div>
+            <div id="explanation"></div>
+            <div id="output"></div>
+            <button id="generateCodeBtn">Kodu Çalıştır</button>
+        </div>
+        <div id="extra-content">
+            <h2>Konu Kapsamı</h2>
+            <div id="topic-scope"></div>
+        </div>
+    </div>
+    <footer>
+        © Ayhan Bozkurt 2024
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const topics = [
+                {
+                    title: "Python Programlama Temelleri",
+                    subtopics: [
+                        {
+                            scenario: "Değişkenler, Veri Türleri, Operatörler",
+                            code: `# Değişkenler ve veri türleri
+sayi = 10  # integer
+isim = "Ayhan"  # string
+gercek = True  # boolean
+pi = 3.14  # float
+
+print(sayi)
+print(isim)
+print(gercek)
+print(pi)`,
+                            explanation: "Bu kod, Python'da değişkenlerin ve veri türlerinin nasıl tanımlandığını gösterir.",
+                            expectedOutput: `10\nAyhan\nTrue\n3.14`,
+                            scope: `Değişkenler, bir programda veri saklamak için kullanılan isimlendirilmiş yerlerdir. 
+                                    Veri türleri, değişkenlerin hangi türde veriler tutacağını belirler. 
+                                    Python'da yaygın olarak kullanılan veri türleri şunlardır: tam sayılar (integer), 
+                                    kayan noktalı sayılar (float), dizeler (string), ve mantıksal değerler (boolean). 
+                                    Operatörler, değişkenler ve değerler üzerinde işlemler yapmak için kullanılır. 
+                                    Python'da aritmetik operatörler (+, -, *, /), karşılaştırma operatörleri (==, !=, <, >), 
+                                    ve mantıksal operatörler (and, or, not) gibi çeşitli operatörler bulunur.`
+                        },
+                        {
+                            scenario: "Kontrol Yapıları",
+                            code: `# Koşullu ifadeler
+yas = 18
+
+if yas < 18:
+    print("Çocuk")
+elif yas >= 18 and yas < 65:
+    print("Yetişkin")
+else:
+    print("Yaşlı")
+
+# Döngüler
+# for döngüsü
+for i in range(5):
+    print(i)
+
+# while döngüsü
+count = 0
+while count < 5:
+    print(count)
+    count += 1`,
+                            explanation: "Bu kod, Python'da koşullu ifadeler ve döngülerin nasıl kullanıldığını gösterir.",
+                            expectedOutput: `Yetişkin\n0\n1\n2\n3\n4\n0\n1\n2\n3\n4`,
+                            scope: `Kontrol yapıları, programın akışını kontrol etmek için kullanılır. 
+                                    Koşullu ifadeler (if, elif, else) belirli bir koşula göre kod bloklarının çalıştırılmasını sağlar. 
+                                    Döngüler (for, while) belirli bir koşul sağlandığı sürece kod bloklarını tekrarlar. 
+                                    Bu yapılar, programın dinamik ve esnek olmasını sağlar. 
+                                    Örneğin, for döngüsü belirli bir aralıkta tekrarlanırken, while döngüsü belirli bir koşul sağlandığı sürece tekrarlanır.`
+                        },
+                        {
+                            scenario: "Fonksiyonlar",
+                            code: `# Fonksiyon tanımlama ve çağırma
+def merhaba_de(yeni_isim):
+    print(f"Merhaba, {yeni_isim}!")
+
+merhaba_de("Ayhan")
+
+# Parametreler ve geri dönüş değerleri
+def topla(a, b):
+    return a + b
+
+sonuc = topla(3, 5)
+print(sonuc)`,
+                            explanation: "Bu kod, Python'da fonksiyonların nasıl tanımlanıp çağrıldığını gösterir.",
+                            expectedOutput: `Merhaba, Ayhan!\n8`,
+                            scope: `Fonksiyonlar, belirli bir görevi yerine getiren kod bloklarıdır. 
+                                    Parametreler, fonksiyonlara veri aktarımı sağlar ve fonksiyonların esnekliğini artırır. 
+                                    Fonksiyonlar, kod tekrarını önler ve kodun okunabilirliğini artırır. 
+                                    Geri dönüş değerleri, fonksiyonların işlemler sonucunda bir değer döndürmesini sağlar. 
+                                    Fonksiyonlar, programın modüler olmasını ve daha kolay yönetilmesini sağlar.`
+                        },
+                        {
+                            scenario: "Veri Yapıları",
+                            code: `# Listeler
+liste = [1, 2, 3, 4, 5]
+print(liste[0])  # İlk elemanı yazdırır
+
+# Tuple'lar
+tuple_ornek = (1, 2, 3)
+print(tuple_ornek[1])  # İkinci elemanı yazdırır
+
+# Sözlükler
+sozluk = {"ad": "Ayhan", "yas": 30}
+print(sozluk["ad"])  # "Ayhan" yazdırır
+
+# Kümeler
+kume = {1, 2, 3, 4, 4, 5}
+print(kume)  # {1, 2, 3, 4, 5} yazdırır, tekrar eden elemanlar çıkarılır`,
+                            explanation: "Bu kod, Python'da veri yapılarının nasıl kullanıldığını gösterir.",
+                            expectedOutput: `1\n2\nAyhan\n{1, 2, 3, 4, 5}`,
+                            scope: `Veri yapıları, verilerin düzenli ve verimli bir şekilde saklanmasını sağlar. 
+                                    Python'da yaygın olarak kullanılan veri yapıları şunlardır: 
+                                    - Listeler: Sıralı ve değiştirilebilir veri koleksiyonlarıdır. 
+                                    - Tuple'lar: Sıralı ve değiştirilemez veri koleksiyonlarıdır. 
+                                    - Sözlükler: Anahtar-değer çiftlerinden oluşan veri koleksiyonlarıdır. 
+                                    - Kümeler: Tekrarlayan elemanları olmayan, sırasız veri koleksiyonlarıdır. 
+                                    Bu veri yapıları, verilerin hızlı bir şekilde erişilmesini ve manipüle edilmesini sağlar.`
+                        },
+                        {
+                            scenario: "Dosya İşlemleri",
+                            code: `# Dosya açma ve yazma
+with open("ornek.txt", "w") as dosya:
+    dosya.write("Merhaba Dünya!")
+
+# Dosya okuma
+with open("ornek.txt", "r") as dosya:
+    icerik = dosya.read()
+    print(icerik)`,
+                            explanation: "Bu kod, Python'da dosya işlemlerinin nasıl yapıldığını gösterir.",
+                            expectedOutput: `Merhaba Dünya!`,
+                            scope: `Dosya işlemleri, verilerin kalıcı olarak saklanmasını ve okunmasını sağlar. 
+                                    Python'da dosya açma, okuma, yazma ve kapama işlemleri için 'open' fonksiyonu kullanılır. 
+                                    Dosya modları, dosyanın nasıl açılacağını belirtir (örneğin, 'r' okuma modu, 'w' yazma modu). 
+                                    'with' ifadesi, dosyanın otomatik olarak kapatılmasını sağlar. 
+                                    Bu sayede, dosya işlemleri daha güvenli ve hatasız bir şekilde gerçekleştirilir.`
+                        },
+                        {
+                            scenario: "Modüller ve Paketler",
+                            code: `# Standart kütüphane kullanımı (math modülü)
+import math
+
+print(math.sqrt(16))  # 4.0
+
+# Üçüncü parti kütüphane kullanımı (requests modülü)
+import requests
+
+response = requests.get("https://api.github.com")
+print(response.status_code)  # 200`,
+                            explanation: "Bu kod, Python'da modül ve paket kullanımını gösterir.",
+                            expectedOutput: `4.0\n200`,
+                            scope: `Modüller ve paketler, kodun yeniden kullanılabilirliğini artırır ve programın modüler olmasını sağlar. 
+                                    Python'da standart kütüphaneler ve üçüncü parti kütüphaneler bulunmaktadır. 
+                                    Standart kütüphaneler, Python ile birlikte gelen ve yaygın olarak kullanılan modüllerdir (örneğin, 'math' modülü). 
+                                    Üçüncü parti kütüphaneler, dış kaynaklar tarafından geliştirilen ve genellikle 'pip' aracılığıyla kurulan modüllerdir (örneğin, 'requests' modülü). 
+                                    Modüller, belirli işlevleri yerine getiren fonksiyonlar ve sınıflar içerir. Bu sayede, kodun okunabilirliği ve bakımı kolaylaşır.`
+                        },
+                        {
+                            scenario: "Hata Yönetimi",
+                            code: `# Hata türleri ve istisnalar
+try:
+    sayi = int(input("Bir sayı girin: "))
+    sonuc = 10 / sayi
+except ZeroDivisionError:
+    print("Sıfıra bölme hatası!")
+except ValueError:
+    print("Geçersiz değer hatası!")
+finally:
+    print("İşlem tamamlandı.")`,
+                            explanation: "Bu kod, Python'da hata yönetiminin nasıl yapıldığını gösterir.",
+                            expectedOutput: `Bir sayı girin: \nSıfıra bölme hatası!\nİşlem tamamlandı.\nveya\nGeçersiz değer hatası!\nİşlem tamamlandı.`,
+                            scope: `Hata yönetimi, programın hatalara karşı dayanıklı olmasını sağlar ve beklenmedik durumlarda programın çökmesini önler. 
+                                    Python'da hata yönetimi için 'try', 'except', 'else' ve 'finally' blokları kullanılır. 
+                                    'try' bloğu, hataların yakalanacağı kodları içerir. 
+                                    'except' bloğu, belirli hata türlerini yakalar ve bu hatalara uygun işlemleri gerçekleştirir. 
+                                    'finally' bloğu, hata oluşsa da oluşmasa da her zaman çalıştırılır ve genellikle temizlik işlemleri için kullanılır. 
+                                    Hata yönetimi, programın daha güvenilir ve kullanıcı dostu olmasını sağlar.`
+                        },
+                        {
+                            scenario: "Nesne Yönelimli Programlama",
+                            code: `# Sınıflar ve nesneler
+class Araba:
+    def __init__(self, marka, model):
+        self.marka = marka
+        self.model = model
+
+    def tanitim(self):
+        return f"Bu araba bir {self.marka} {self.model}."
+
+araba1 = Araba("Toyota", "Corolla")
+print(araba1.tanitim())
+
+# Kalıtım ve çok biçimlilik
+class ElektrikliAraba(Araba):
+    def __init__(self, marka, model, batarya_kapasitesi):
+        super().__init__(marka, model)
+        self.batarya_kapasitesi = batarya_kapasitesi
+
+    def tanitim(self):
+        return f"Bu araba bir {self.marka} {self.model}, batarya kapasitesi {self.batarya_kapasitesi} kWh."
+
+tesla = ElektrikliAraba("Tesla", "Model S", 100)
+print(tesla.tanitim())`,
+                            explanation: "Bu kod, Python'da nesne yönelimli programlamanın nasıl yapıldığını gösterir.",
+                            expectedOutput: `Bu araba bir Toyota Corolla.\nBu araba bir Tesla Model S, batarya kapasitesi 100 kWh.`,
+                            scope: `Nesne yönelimli programlama (OOP), programların nesneler ve sınıflar kullanılarak tasarlanmasını sağlar. 
+                                    Sınıflar, nesnelerin özelliklerini ve davranışlarını tanımlar. 
+                                    Nesneler, sınıfların örnekleridir ve belirli bir sınıfa ait özellikleri ve davranışları taşır. 
+                                    OOP, kodun yeniden kullanılabilirliğini artırır ve programın daha modüler olmasını sağlar. 
+                                    Kalıtım, bir sınıfın başka bir sınıfın özelliklerini ve davranışlarını devralmasını sağlar. 
+                                    Çok biçimlilik, aynı işlemin farklı nesneler üzerinde farklı şekillerde çalışmasını sağlar.`
+                        }
+                    ]
+                },
+                {
+                    title: "Veri Bilimi",
+                    subtopics: [
+                        {
+                            scenario: "Veri Analizi ve Görselleştirme",
+                            code: `import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Veri okuma ve temizleme
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000]
+})
+veri = veri.dropna()  # Eksik değerleri kaldırma
+
+# Temel istatistiksel analizler
+print(veri.describe())
+
+# Veri görselleştirme
+plt.figure(figsize=(10, 6))
+sns.histplot(veri['yas'], kde=True)
+plt.title("Yaş Dağılımı")
+plt.show()`,
+                            explanation: "Bu kod, Python'da veri analizinin ve görselleştirmenin nasıl yapıldığını gösterir.",
+                            expectedOutput: `yas gelir\ncount 10.000000 10.000000\nmean 34.900000 8450.000000\nstd 10.859314 2208.181345\nmin 22.000000 5000.000000\n25% 25.500000 7075.000000\n50% 34.000000 8250.000000\n75% 45.250000 9825.000000\nmax 49.000000 12000.000000\nve histogram grafiği`,
+                            scope: `Veri bilimi, büyük veri setlerinin analiz edilmesini ve görselleştirilmesini sağlar. 
+                                    Veri analizi, verilerin anlamlı bilgilere dönüştürülmesini içerir. 
+                                    Python'da veri analizi için yaygın olarak kullanılan kütüphaneler arasında pandas, numpy ve matplotlib bulunur. 
+                                    Veri görselleştirme, verilerin grafiksel olarak sunulmasını sağlar ve verilerin daha iyi anlaşılmasına yardımcı olur. 
+                                    Seaborn, veri görselleştirme için kullanılan popüler bir Python kütüphanesidir. 
+                                    Veri bilimi, çeşitli istatistiksel ve makine öğrenimi tekniklerini kullanarak verilerden değerli bilgiler elde etmeyi amaçlar.`
+                        }
+                    ]
+                },
+                {
+                    title: "Makine Öğrenmesi",
+                    subtopics: [
+                        {
+                            scenario: "Doğrusal Regresyon",
+                            code: `from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import pandas as pd
+
+# Veri hazırlama
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000],
+    'harcama': [2000, 2200, 6000, 3000, 5800, 2500, 4000, 4800, 3200, 5900]
+})
+
+X = veri[['yas', 'gelir']]
+y = veri['harcama']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model oluşturma ve eğitme
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Tahmin ve değerlendirme
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")`,
+                            explanation: "Bu kod, Python'da doğrusal regresyon modelinin nasıl oluşturulup eğitildiğini gösterir.",
+                            expectedOutput: `Mean Squared Error: 359910.1531519997`,
+                            scope: `Doğrusal regresyon, bir bağımlı değişkenin bir veya daha fazla bağımsız değişken ile olan doğrusal ilişkisini modellemek için kullanılan bir makine öğrenimi algoritmasıdır. 
+                                    Bu algoritma, bağımsız değişkenler ile bağımlı değişken arasındaki en iyi doğrusal ilişkiyi bulmayı amaçlar. 
+                                    Doğrusal regresyon, tahmin ve veri analizi için yaygın olarak kullanılır. 
+                                    Model eğitimi sırasında, model veri setindeki bağımsız değişkenler ile bağımlı değişken arasındaki ilişkiyi öğrenir. 
+                                    Model tahmin ve değerlendirme adımlarında, modelin performansı çeşitli metrikler kullanılarak değerlendirilir.`
+                        },
+                        {
+                            scenario: "Karar Ağaçları",
+                            code: `from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# Veri hazırlama
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000],
+    'kategori': [0, 0, 1, 0, 1, 0, 0, 1, 0, 1]
+})
+
+X = veri[['yas', 'gelir']]
+y = veri['kategori']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model oluşturma ve eğitme
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Tahmin ve değerlendirme
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy}")`,
+                            explanation: "Bu kod, Python'da karar ağacı modelinin nasıl oluşturulup eğitildiğini gösterir.",
+                            expectedOutput: `Accuracy: 1.0`,
+                            scope: `Karar ağaçları, sınıflandırma ve regresyon problemleri için kullanılan güçlü ve esnek makine öğrenimi algoritmalarıdır. 
+                                    Karar ağaçları, verileri karar düğümleri ve yaprak düğümlerine ayırarak sınıflandırma veya tahmin yapar. 
+                                    Her düğüm, bir özelliğe dayalı olarak veri setini böler ve her yaprak düğüm, bir sınıf veya değer tahminini temsil eder. 
+                                    Karar ağaçları, veri setindeki özellikler ve değerler arasındaki ilişkileri anlamak için görsel ve sezgisel bir yol sağlar. 
+                                    Karar ağaçları, anlaşılması ve yorumlanması kolay modellerdir ve eksik verilerle başa çıkma yeteneğine sahiptir.`
+                        },
+                        {
+                            scenario: "K-Means Kümeleme",
+                            code: `from sklearn.cluster import KMeans
+import pandas as pd
+
+# Veri hazırlama
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000]
+})
+
+# K-Means kümeleme
+kmeans = KMeans(n_clusters=3)
+veri['kume'] = kmeans.fit_predict(veri[['yas', 'gelir']])
+
+print(veri)`,
+                            explanation: "Bu kod, Python'da K-Means kümeleme algoritmasının nasıl kullanıldığını gösterir.",
+                            expectedOutput: `yas gelir kume\n0 22 5000 2\n1 25 6000 2\n2 47 12000 1\n3 35 8000 0\n4 46 11000 1\n5 23 7000 2\n6 33 8500 0\n7 42 9500 0\n8 27 7600 0\n9 49 10000 1`,
+                            scope: `K-Means kümeleme, verileri K kümesine ayırmak için kullanılan yaygın bir gözetimsiz öğrenme algoritmasıdır. 
+                                    Algoritma, her küme için bir merkez (centroid) belirler ve verileri en yakın merkezlere atar. 
+                                    Kümeleme, benzer özelliklere sahip verilerin gruplandırılmasını sağlar ve veriler arasındaki benzerlikleri ortaya çıkarır. 
+                                    K-Means algoritması, başlangıçta rastgele seçilen K merkez ile başlar ve merkezleri optimize etmek için iteratif olarak çalışır. 
+                                    K-Means, büyük veri setleri için hızlı ve etkili bir kümeleme yöntemidir.`
+                        },
+                        {
+                            scenario: "PCA ile Boyut İndirgeme",
+                            code: `from sklearn.decomposition import PCA
+import pandas as pd
+
+# Veri hazırlama
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000]
+})
+
+# PCA boyut indirgeme
+pca = PCA(n_components=1)
+veri_pca = pca.fit_transform(veri[['yas', 'gelir']])
+
+print(veri_pca)`,
+                            explanation: "Bu kod, Python'da PCA kullanarak boyut indirgeme işleminin nasıl yapıldığını gösterir.",
+                            expectedOutput: `[[ -2463.28784255]\n [ -2122.30910292]\n [ 7453.67680216]\n [ 1352.07381612]\n [ 6312.69888315]\n [ -1671.33136329]\n [ 1171.09264402]\n [ 2081.03704959]\n [ -727.36461372]\n [ 1965.61472743]]`,
+                            scope: `PCA (Principal Component Analysis), yüksek boyutlu veri setlerinin boyutunu azaltmak için kullanılan bir tekniktir. 
+                                    PCA, verilerin temel bileşenlerini bularak veri setindeki boyut sayısını azaltır ve verilerin daha kolay analiz edilmesini sağlar. 
+                                    Boyut indirgeme, verilerin görselleştirilmesi, veri sıkıştırma ve gürültünün azaltılması gibi uygulamalarda kullanılır. 
+                                    PCA, verilerdeki en fazla varyansı açıklayan doğrusal kombinasyonları bulur ve bu kombinasyonları temel bileşenler olarak adlandırır. 
+                                    PCA, makine öğrenimi modellerinin performansını artırmak ve hesaplama maliyetlerini azaltmak için etkili bir yöntemdir.`
+                        }
+                    ]
+                },
+                {
+                    title: "Derin Öğrenme",
+                    subtopics: [
+                        {
+                            scenario: "Yapay Sinir Ağları (ANN)",
+                            code: `import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Veri hazırlama
+veri = pd.DataFrame({
+    'yas': [22, 25, 47, 35, 46, 23, 33, 42, 27, 49],
+    'gelir': [5000, 6000, 12000, 8000, 11000, 7000, 8500, 9500, 7600, 10000],
+    'harcama': [2000, 2200, 6000, 3000, 5800, 2500, 4000, 4800, 3200, 5900]
+})
+
+X = veri[['yas', 'gelir']]
+y = veri['harcama']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Veri ölçekleme
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Model oluşturma
+model = Sequential()
+model.add(Dense(32, activation='relu', input_shape=(X_train.shape[1],)))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='linear'))
+
+# Model derleme
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Model eğitimi
+model.fit(X_train, y_train, epochs=100, batch_size=10, validation_split=0.2)
+
+# Tahmin ve değerlendirme
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")`,
+                            explanation: "Bu kod, Python'da yapay sinir ağlarının nasıl oluşturulup eğitildiğini gösterir.",
+                            expectedOutput: `Mean Squared Error: <mse_degeri>`,
+                            scope: `Yapay sinir ağları (ANN), insan beyninin çalışma prensiplerinden esinlenerek tasarlanmış bir makine öğrenimi algoritmasıdır. 
+                                    Sinir ağları, katmanlar halinde düzenlenmiş düğümlerden (nöronlar) oluşur ve bu düğümler arasında bağlantılar bulunur. 
+                                    Giriş katmanı, ağın aldığı veriyi temsil eder; çıkış katmanı, ağın tahmin veya sınıflandırma sonucunu temsil eder. 
+                                    Ara katmanlar (gizli katmanlar), ağın öğrenme sürecinde karmaşık veri ilişkilerini öğrenmesine yardımcı olur. 
+                                    Sinir ağları, ileri beslemeli ağlar (feedforward) ve geri yayılım (backpropagation) algoritması ile eğitilir. 
+                                    Yapay sinir ağları, görüntü tanıma, doğal dil işleme ve oyun oynama gibi çeşitli uygulamalarda kullanılır.`
+                        },
+                        {
+                            scenario: "Evrişimli Sinir Ağları (CNN)",
+                            code: `import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+
+# Veri hazırlama
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+X_train = X_train.reshape(-1, 28, 28, 1).astype('float32') / 255
+X_test = X_test.reshape(-1, 28, 28, 1).astype('float32') / 255
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+
+# Model oluşturma
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+# Model derleme
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Model eğitimi
+model.fit(X_train, y_train, epochs=10, batch_size=128, validation_split=0.2)
+
+# Tahmin ve değerlendirme
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f"Loss: {loss}, Accuracy: {accuracy}")`,
+                            explanation: "Bu kod, Python'da evrişimli sinir ağlarının nasıl oluşturulup eğitildiğini gösterir.",
+                            expectedOutput: `Loss: <loss_degeri>, Accuracy: <accuracy_degeri>`,
+                            scope: `Evrişimli sinir ağları (CNN), özellikle görüntü işleme ve bilgisayarla görme uygulamalarında kullanılan derin öğrenme modelleridir. 
+                                    CNN'ler, giriş görüntülerindeki özellikleri otomatik olarak öğrenmek ve tanımak için evrişim (convolution) ve havuzlama (pooling) katmanlarını kullanır. 
+                                    Evrişim katmanları, görüntü üzerindeki yerel özellikleri tespit eder ve bu özellikleri filtreler aracılığıyla çıkarır. 
+                                    Havuzlama katmanları, özellik haritalarını aşağı örnekleyerek (downsampling) boyutlarını küçültür ve önemli bilgileri korur. 
+                                    CNN'ler, yüz tanıma, nesne tespiti ve görüntü sınıflandırma gibi görevlerde yüksek performans gösterir.`
+                        }
+                    ]
+                }
+            ];
+
+            const topicList = document.getElementById('topic-list');
+            const dropzone = document.getElementById('dropzone');
+            const output = document.getElementById('output');
+            const explanationDiv = document.getElementById('explanation');
+            const topicScope = document.getElementById('topic-scope');
+            const generateCodeBtn = document.getElementById('generateCodeBtn');
+
+            topics.forEach(topic => {
+                topic.subtopics.forEach(subtopic => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('scenario-block');
+                    listItem.draggable = true;
+                    listItem.textContent = `${topic.title} - ${subtopic.scenario}`;
+                    listItem.dataset.code = subtopic.code;
+                    listItem.dataset.explanation = subtopic.explanation;
+                    listItem.dataset.expectedOutput = subtopic.expectedOutput;
+                    listItem.dataset.scope = subtopic.scope;
+
+                    listItem.addEventListener('dragstart', (event) => {
+                        event.dataTransfer.setData('text/plain', event.target.dataset.code);
+                        event.dataTransfer.setData('text/plain-explanation', event.target.dataset.explanation);
+                        event.dataTransfer.setData('text/plain-expectedOutput', event.target.dataset.expectedOutput);
+                        event.dataTransfer.setData('text/plain-scope', event.target.dataset.scope);
+                    });
+
+                    topicList.appendChild(listItem);
+                });
+            });
+
+            dropzone.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+
+            dropzone.addEventListener('drop', (event) => {
+                event.preventDefault();
+                dropzone.classList.remove('dragover');
+                const code = event.dataTransfer.getData('text/plain');
+                const explanation = event.dataTransfer.getData('text/plain-explanation');
+                const expectedOutput = event.dataTransfer.getData('text/plain-expectedOutput');
+                const scope = event.dataTransfer.getData('text/plain-scope');
+                addCodeBlock(code, explanation, expectedOutput, scope);
+            });
+
+            function addCodeBlock(code, explanation, expectedOutput, scope) {
+                output.innerHTML = '';  // Clear previous output
+                explanationDiv.innerHTML = ''; // Clear previous explanation
+                topicScope.innerHTML = ''; // Clear previous topic scope
+
+                const codeBlock = document.createElement('div');
+                codeBlock.classList.add('code-block');
+                codeBlock.textContent = code;
+
+                const explanationBlock = document.createElement('div');
+                explanationBlock.classList.add('code-explanation');
+                explanationBlock.textContent = explanation;
+
+                const outputBlock = document.createElement('div');
+                outputBlock.classList.add('code-output');
+                outputBlock.textContent = `Beklenen Çıktı:\n${expectedOutput}`;
+
+                const scopeBlock = document.createElement('div');
+                scopeBlock.classList.add('code-scope');
+                scopeBlock.textContent = scope;
+
+                explanationDiv.appendChild(explanationBlock);
+                output.appendChild(codeBlock);
+                output.appendChild(outputBlock);
+                topicScope.appendChild(scopeBlock);
+            }
+
+            generateCodeBtn.addEventListener('click', () => {
+                const codeBlock = output.querySelector('.code-block');
+                if (codeBlock) {
+                    const code = codeBlock.textContent;
+                    executeCode(code);
+                }
+            });
+
+            function executeCode(code) {
+                // Kodun çalıştırılması ve sonuçların gösterilmesi burada yapılacak
+                console.log("Kod çalıştırılıyor: \n", code);
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
